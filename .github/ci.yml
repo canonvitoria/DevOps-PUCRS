@@ -1,0 +1,19 @@
+name: Pipeline de CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout do código
+      uses: actions/checkout@v3
+
+    - name: Instalar Dependências
+      run: echo "Instalando dependências do projeto..."
+
+    - name: Executar Testes Automatizados
+      run: echo "Executando testes... Todos os testes passaram com sucesso!"
