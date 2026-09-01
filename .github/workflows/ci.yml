@@ -20,7 +20,7 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.HOST_DA_AWS }}
-        username: ubuntu
+        username: ec2-user
         key: ${{ secrets.CHAVE_SSH_DA_AWS }}
         script: |
           # Instala o Docker e Git no servidor
