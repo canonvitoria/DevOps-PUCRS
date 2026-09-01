@@ -1,19 +1,39 @@
-name: Pipeline de CI
+name: Pipeline de CI/CD
 
 on:
   push:
     branches: [ "main" ]
 
 jobs:
-  build-and-test:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout do código
       uses: actions/checkout@v3
 
-    - name: Instalar Dependências
-      run: echo "Instalando dependências do projeto..."
-
     - name: Executar Testes Automatizados
       run: echo "Executando testes... Todos os testes passaram com sucesso!"
+
+    # ETAPA DE ENTREGA CONTÍNUA (CD)
+    - name: Deploy no Servidor AWS (EC2)
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST_DA_AWS }}
+        username: ubuntu
+        key: ${{ secrets.CHAVE_SSH_DA_AWS }}
+        script: |
+          # Instala o Docker e Git no servidor
+          sudo apt-get update -y
+          sudo apt-get install docker.io git -y
+          
+          # 2. Baixa ou atualiza o repositório dentro do servidor
+          if [ ! -d "DevOps-PUCRS" ]; then
+            git clone https://github.com/canonvitoria/DevOps-PUCRS.git
+          fi
+          cd DevOps-PUCRS
+          git pull origin main
+          
+          # 3. Executa o deploy do container
+          chmod +x deploy.sh
+          sudo ./deploy.sh
