@@ -15,7 +15,7 @@ jobs:
     - name: Executar Testes Automatizados
       run: echo "Executando testes... Todos os testes passaram com sucesso!"
 
-    # ETAPA DE ENTREGA CONTÍNUA (CD)
+  # ETAPA DE ENTREGA CONTÍNUA (CD)
     - name: Deploy no Servidor AWS (EC2)
       uses: appleboy/ssh-action@master
       with:
@@ -23,17 +23,21 @@ jobs:
         username: ec2-user
         key: ${{ secrets.CHAVE_SSH_DA_AWS }}
         script: |
-          # Instala o Docker e Git no servidor
-          sudo apt-get update -y
-          sudo apt-get install docker.io git -y
+          # 1. Instala o Docker e Git no Amazon Linux
+          sudo yum update -y
+          sudo yum install docker git -y
           
-          # 2. Baixa ou atualiza o repositório dentro do servidor
+          # 2. Inicia o serviço do Docker (necessário no Amazon Linux)
+          sudo service docker start
+          sudo usermod -aG docker ec2-user
+          
+          # 3. Baixa ou atualiza o repositório dentro do servidor
           if [ ! -d "DevOps-PUCRS" ]; then
             git clone https://github.com/canonvitoria/DevOps-PUCRS.git
           fi
           cd DevOps-PUCRS
           git pull origin main
           
-          # 3. Executa o deploy do container
+          # 4. Executa o deploy do container
           chmod +x deploy.sh
           sudo ./deploy.sh
